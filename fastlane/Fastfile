@@ -84,6 +84,8 @@ platform :ios do
         tag: "v#{version}"
     )
 
+    push_git_tags
+
     delete_keychain(name: "mykeychain")
   end
 end
