@@ -2,7 +2,7 @@ name: Deploy Debug App to App Store
 
 on:
   push:
-    branches: [ main ]
+    branches: [ release ]
 
 jobs:
   build:
