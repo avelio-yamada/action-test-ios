@@ -1,0 +1,62 @@
+name: Deploy Production App
+
+on:
+  push:
+    branches: [ deploy/production ]
+
+jobs:
+  build:
+    name: Deploy Production App to App Store
+    runs-on: macos-11
+
+    steps:
+    - name: Checkout deploy/production
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set Xcode Path
+      run: sudo xcode-select --switch /Applications/Xcode_12.5.1.app/Contents/Developer
+
+    - name: Import Certificates and Provisioning Profile
+      run: |
+        echo "${{ secrets.CERTIFICATES_P12 }}" > certificates.p12.txt
+        base64 --decode certificates.p12.txt > certificates.p12
+        echo "${{ secrets.PROVISIONING_PROFILE }}" > ios.mobileprovision.txt
+        base64 --decode ios.mobileprovision.txt > ios.mobileprovision
+
+    - name: Bundle Install
+      run: bundle install
+
+    - name: Check History
+      run: |
+        hash=$(git log --no-walk --tags --pretty="%h" | head -n 1)
+        count=$(git log --all $hash^..HEAD --pretty="%d" --grep deploy/staging | wc -l)
+        echo "::set-output name=HISTORY_COUNT::${count}"
+      id: check-history
+
+    - name: Checkout main
+      if: steps.check-history.outputs.HISTORY_COUNT == 0
+      uses: actions/checkout@v2
+      with:
+        ref: main
+
+    - name: Increment Build Number
+      if: steps.check-history.outputs.HISTORY_COUNT == 0
+      run: bundle exec fastlane add_build_number
+
+    - name: Rebase deploy/production
+      if: steps.check-history.outputs.HISTORY_COUNT == 0
+      run: |
+        git rebase main deploy/production
+        git push origin deploy/production
+
+    - name: Checkout deploy/production
+      if: steps.check-history.outputs.HISTORY_COUNT == 0
+      uses: actions/checkout@v2
+
+    - name: Upload App Store
+      env:
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+      run: bundle exec fastlane deploy_release
