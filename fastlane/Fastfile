@@ -81,7 +81,7 @@ platform :ios do
     )
 
     add_git_tag(
-        prefix: "v#{version}"
+        tag: "v#{version}"
     )
 
     delete_keychain(name: "mykeychain")
