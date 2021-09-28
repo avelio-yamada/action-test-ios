@@ -110,3 +110,4 @@ vendor/
 *.p12
 *.txt
 *.mobileprovision
+*.dSYM*
