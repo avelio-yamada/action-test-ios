@@ -39,7 +39,9 @@ platform :ios do
 
     import_certificates_and_provisioning_profile
 
-    increment_build_number
+    increment_build_number(
+        skip_info_plist: true
+    )
 
     commit_version_bump(
         message: "update build version",
