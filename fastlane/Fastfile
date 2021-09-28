@@ -60,4 +60,30 @@ platform :ios do
 
     delete_keychain(name: "mykeychain")
   end
+
+  desc "Deploy Release App to App Store"
+  lane :deploy_release do
+
+    cocoapods
+
+    import_certificates_and_provisioning_profile
+
+    gym(workspace: "github-action.xcworkspace",
+        scheme: "github-action",
+        clean: true,
+        export_options: {
+            method: "ad-hoc"
+        }
+    )
+
+    version = get_version_number(
+        xcodeproj: "github-action.xcodeproj"
+    )
+
+    add_git_tag(
+        prefix: "v#{version}"
+    )
+
+    delete_keychain(name: "mykeychain")
+  end
 end
