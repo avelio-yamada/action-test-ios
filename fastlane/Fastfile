@@ -1,0 +1,69 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Import Certificates and Provisioning Profile"
+  private_lane :import_certificates_and_provisioning_profile do
+    create_keychain(
+        name: "mykeychain",
+        password: ENV["KEYCHAIN_PASSWORD"],
+        timeout: 1000
+    )
+    import_certificate(
+        certificate_path: "certificates.p12",
+        certificate_password: ENV["CERTIFICATE_PASSWORD"],
+        keychain_name: "mykeychain",
+        keychain_password: ENV["KEYCHAIN_PASSWORD"]
+    )
+    install_provisioning_profile(path: "ios.mobileprovision")
+  end
+
+  desc "Deploy Debug App to App Store"
+  lane :deploy_debug do
+  end
+
+  desc "Add Build Number"
+  lane :add_build_number do
+
+    increment_build_number(
+        skip_info_plist: true
+    )
+
+    commit_version_bump(
+        message: "update build version",
+        xcodeproj: "github-action.xcodeproj"
+    )
+
+    push_to_git_remote
+  end
+
+  desc "Deploy Release App to App Store"
+  lane :deploy_release do
+    version = get_version_number(
+        xcodeproj: "github-action.xcodeproj"
+    )
+
+    add_git_tag(
+        tag: "#{version}",
+        force: true
+    )
+
+    push_git_tags(
+        force: true
+    )
+  end
+end
