@@ -53,7 +53,7 @@ platform :ios do
 
     commit_version_bump(
         message: "update build version",
-        xcodeproj: "./github-action.xcodeproj"
+        xcodeproj: "github-action.xcodeproj"
     )
 
     push_to_git_remote
