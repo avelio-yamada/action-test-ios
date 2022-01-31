@@ -31,11 +31,11 @@ jobs:
     - name: Check History
       run: |
         hash=$(git log --no-walk --tags --pretty="%h" | head -n 1)
-        count=$(git log --all $hash^..HEAD --pretty="%d" --grep deploy/staging | wc -l)
+        count=$(git --graph deploy/staging $hash^..HEAD --pretty="%d" | wc -l)
         echo "::set-output name=HISTORY_COUNT::${count}"
       id: check-history
 
-    - name: Checkout main
+    - name: Switch main
       if: steps.check-history.outputs.HISTORY_COUNT == 0
       uses: actions/checkout@v2
       with:
@@ -43,15 +43,12 @@ jobs:
 
     - name: Increment Build Number
       if: steps.check-history.outputs.HISTORY_COUNT == 0
-      run: bundle exec fastlane add_build_number
-
-    - name: Rebase deploy/production
-      if: steps.check-history.outputs.HISTORY_COUNT == 0
       run: |
+        bundle exec fastlane add_build_number
         git rebase main deploy/production
         git push origin deploy/production
 
-    - name: Checkout deploy/production
+    - name: Switch deploy/production
       if: steps.check-history.outputs.HISTORY_COUNT == 0
       uses: actions/checkout@v2
 
