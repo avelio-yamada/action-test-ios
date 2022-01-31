@@ -32,7 +32,7 @@ jobs:
     - name: Check History
       run: |
         hash=$(git log --no-walk --tags --pretty="%h" | head -n 1)
-        count=$(git log --all $hash^..HEAD --pretty="%h %d %s" --grep \deploy_debug | wc -l)
+        count=$(git log --all $hash^..HEAD --pretty="%d" --grep deploy/staging | wc -l)
         echo "::set-output name=HISTORY_COUNT::${count}"
       id: check-history
 
