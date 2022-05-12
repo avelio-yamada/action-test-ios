@@ -39,12 +39,13 @@ jobs:
       run: |
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
-        git fetch
+        git fetch --all
+        git pull --all
         echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
         echo $hash
-        branch_name=$(git branch --contains $hash | grep "release/")
-        echo $branch_name
-        git checkout $branch_name
+        refname=$(git branch --contains $hash | grep "release/")
+        echo $refname
+        git checkout $refname
         git rebase deploy/staging
         git push
