@@ -1,0 +1,25 @@
+name: Test Workflow
+
+on:
+  push:
+    branches: [ feature/test ]
+
+jobs:
+  build:
+    name: Test
+    runs-on: macos-11
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Git fetch
+      run: |
+        git config --local user.email "runner@${{ runner.os }}"
+        git config --local user.name "runner"
+        git fetch
+        git checkout deploy/staging
+        hash=$(git log --pretty="%h" deploy/staging | head -n 1)
+        branch_name=$(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
+        echo $branch_name
+        echo branch_name

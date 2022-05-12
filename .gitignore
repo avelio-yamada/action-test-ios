@@ -112,3 +112,4 @@ vendor/
 *.mobileprovision
 *.dSYM*
 Gemfile.lock
+fastlane/README.md

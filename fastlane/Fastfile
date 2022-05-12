@@ -32,10 +32,6 @@ platform :ios do
     install_provisioning_profile(path: "ios.mobileprovision")
   end
 
-  desc "Deploy Debug App to App Store"
-  lane :deploy_debug do
-  end
-
   desc "Add Build Number"
   lane :add_build_number do
 
@@ -49,6 +45,10 @@ platform :ios do
     )
 
     push_to_git_remote
+  end
+
+  desc "Deploy Debug App to App Store"
+  lane :deploy_staging do
   end
 
   desc "Deploy Release App to App Store"
