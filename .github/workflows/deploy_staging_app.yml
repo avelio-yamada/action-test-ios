@@ -42,10 +42,10 @@ jobs:
         git fetch
         echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
-        git branch --contains $hash
-        echo $(git branch --contains $hash | grep "origin/release/")
-        echo $(git branch --contains $hash | grep "origin/release/") | sed 's/\*\ //g'
-        refname=$(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
+        git branch -r --contains $hash
+        echo $(git branch -r --contains $hash | grep "origin/release/")
+        echo $(git branch -r --contains $hash | grep "origin/release/") | sed 's/\*\ //g'
+        refname=$(git branch -r --contains $hash | grep "release/") | sed 's/\*\ //g'
         echo $refname
         echo "::set-output name=REF_NAME::${refname}"
       id: check-history
