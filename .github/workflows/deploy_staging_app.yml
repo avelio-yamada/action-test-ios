@@ -45,7 +45,7 @@ jobs:
         git branch -r --contains $hash
         echo $(git branch -r --contains $hash | grep "origin/release/")
         echo $(git branch -r --contains $hash | grep "origin/release/") | sed 's/origin\///g'
-        refname=$(git branch -r --contains $hash | grep "origin/release/") | sed 's/origin\///g
+        refname=$(git branch -r --contains $hash | grep "origin/release/") | sed 's/origin\///g'
         echo $refname
         echo "::set-output name=REF_NAME::${refname}"
       id: check-history
@@ -55,6 +55,7 @@ jobs:
 
     - name: Rebase Release Branch
       run: |
+        echo ${{ steps.check-history.outputs.REF_NAME }}
         git checkout ${{ steps.check-history.outputs.REF_NAME }}
         git rebase deploy/staging
         git push
