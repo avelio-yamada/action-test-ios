@@ -32,21 +32,27 @@ jobs:
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
       run: bundle exec fastlane deploy_staging
 
-    - name: Increment Build Number
-      run: bundle exec fastlane add_build_number
-
-    - name: Rebase Release Branch
+    - name: Git Settings
       run: |
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
-        git branch -r | grep -v "\->" | grep -v deploy/staging | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
-        git fetch --all
-        git pull --all
+
+    - name: Check History
+      run: |
+        git fetch
         echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
         echo $hash
         refname=$(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
         echo $refname
-        git checkout $refname
+        echo "::set-output name=REF_NAME::${refname}"
+      id: check-history
+
+    - name: Increment Build Number
+      run: bundle exec fastlane add_build_number
+
+    - name: Rebase Release Branch
+      run: |
+        git checkout ${{ steps.check-history.outputs.REF_NAME }}
         git rebase deploy/staging
         git push
