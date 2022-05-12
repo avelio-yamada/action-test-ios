@@ -10,11 +10,11 @@ jobs:
     runs-on: macos-11
 
     steps:
-    - name: Checkout deploy/staging
+    - name: Checkout
       uses: actions/checkout@v2
 
     - name: Set Xcode Path
-      run: sudo xcode-select --switch /Applications/Xcode_12.5.1.app/Contents/Developer
+      run: sudo xcode-select --switch /Applications/Xcode_13.2.1.app/Contents/Developer
 
     - name: Import Certificates and Provisioning Profile
       run: |
@@ -30,12 +30,16 @@ jobs:
       env:
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-      run: bundle exec fastlane deploy_debug
-
-    - name: Switch release
-      uses: actions/checkout@v2
-      with:
-        ref: release
+      run: bundle exec fastlane deploy_staging
 
     - name: Increment Build Number
       run: bundle exec fastlane add_build_number
+
+    - name: Rebase Release
+      run: |
+        git config --local user.email "runner@${{ runner.os }}"
+        git config --local user.name "runner"
+        git fetch
+        git checkout release
+        git rebase deploy/staging
+        git push
