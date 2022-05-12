@@ -35,14 +35,14 @@ jobs:
     - name: Increment Build Number
       run: bundle exec fastlane add_build_number
 
-    - name: Rebase Release
+    - name: Rebase Release Branch
       run: |
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
         git fetch
+        echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
         echo $hash
-        git branch --contains $hash | grep "release/"
         branch_name=$(git branch --contains $hash | grep "release/")
         echo $branch_name
         git checkout $branch_name
