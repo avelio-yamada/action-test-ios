@@ -42,6 +42,7 @@ jobs:
         git fetch
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
         echo $hash
+        git branch --contains $hash | grep "release/"
         branch_name=$(git branch --contains $hash | grep "release/")
         echo $branch_name
         git checkout $branch_name
