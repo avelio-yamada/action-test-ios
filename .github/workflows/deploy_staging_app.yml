@@ -40,10 +40,9 @@ jobs:
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
         git fetch
-        git log --pretty="%h" deploy/staging | head -n 1
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
-        echo $(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
-        branch_name=$(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
+        echo $hash
+        branch_name=$(git branch --contains $hash | grep "release/")
         echo $branch_name
         git checkout $branch_name
         git rebase deploy/staging
