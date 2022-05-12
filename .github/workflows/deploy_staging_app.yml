@@ -39,13 +39,13 @@ jobs:
       run: |
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
-        git branch -r | grep -v "\->" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+        git branch -r | grep -v "\->" | grep -v deploy/staging | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
         git fetch --all
         git pull --all
         echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
         hash=$(git log --pretty="%h" deploy/staging | head -n 1)
         echo $hash
-        refname=$(git branch --contains $hash | grep "release/")
+        refname=$(git branch --contains $hash | grep "release/") | sed 's/\*\ //g'
         echo $refname
         git checkout $refname
         git rebase deploy/staging
