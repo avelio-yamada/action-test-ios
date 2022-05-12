@@ -39,6 +39,7 @@ jobs:
       run: |
         git config --local user.email "runner@${{ runner.os }}"
         git config --local user.name "runner"
+        git branch -r | grep -v "\->" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
         git fetch --all
         git pull --all
         echo $(git log --pretty="%h %d" deploy/staging | head -n 1)
