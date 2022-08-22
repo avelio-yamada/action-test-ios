@@ -58,7 +58,7 @@ platform :ios do
         scheme: "github-action",
         clean: true,
         export_options: {
-            method: "app-store"
+            method: "ad-hoc"
         }
     )
 
