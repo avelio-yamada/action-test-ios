@@ -49,6 +49,19 @@ platform :ios do
 
   desc "Deploy Debug App to App Store"
   lane :deploy_staging do
+
+    cocoapods
+
+    import_certificates_and_provisioning_profile
+
+    gym(workspace: "github-action.xcworkspace",
+        scheme: "github-action",
+        clean: true,
+        export_options: {
+            method: "app-store"
+        }
+    )
+
   end
 
   desc "Deploy Release App to App Store"
